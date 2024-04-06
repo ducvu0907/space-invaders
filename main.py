@@ -6,7 +6,6 @@ screen_width, screen_height = 800, 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Space Invaders")
 
-# player
 class Player():
   def __init__(self):
     self.image = pygame.image.load("assets/player.png").convert_alpha()
@@ -37,7 +36,6 @@ class Player():
   def shoot(self):
     self.ammos.append(Ammo(self.rect.center))
   
-# ammo
 class Ammo:
   def __init__(self, pos):
     self.image = pygame.Surface((4, 20))
@@ -45,25 +43,40 @@ class Ammo:
     self.rect = self.image.get_rect(midbottom=pos)
     self.speed = -9
 
-# enemies
 class Enemy:
   def __init__(self):
-    pass
+    self.enemies = []
+    self.red = pygame.image.load("assets/red.png")
+    self.green = pygame.image.load("assets/green.png")
+    self.yellow = pygame.image.load("assets/yellow.png")
 
-# create instances
+# game objects/components
 player = Player()
+score = 0
+font = pygame.font.Font("font/Pixeled.ttf")
+score_sf = font.render(f"Score: {score}", True, (255, 255, 255))
+score_rect = score_sf.get_rect(topleft=(0, 0))
+enemy = pygame.USEREVENT + 1
 
+# update game
 def update():
-  screen.blit(player.image, player.rect)
-  player.recharge()
-  player.move()
-  for ammo in player.ammos:
-    screen.blit(ammo.image, ammo.rect)
-    ammo.rect.y += ammo.speed
-    # delete ammo when out of bound
-    if ammo.rect.bottom <= 0:
-      player.ammos.remove(ammo)
-      del ammo
+  def update_player():
+    screen.blit(player.image, player.rect)
+    player.recharge()
+    player.move()
+  def update_ammo():
+    for ammo in player.ammos:
+      screen.blit(ammo.image, ammo.rect)
+      ammo.rect.y += ammo.speed
+      if ammo.rect.bottom <= 0:
+        player.ammos.remove(ammo)
+        del ammo
+  def update_score():
+    screen.blit(score_sf, score_rect)
+
+  update_player()
+  update_ammo()
+  update_score()
 
 def run():
   while True:
